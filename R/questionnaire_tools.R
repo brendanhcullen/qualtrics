@@ -117,7 +117,7 @@ get_uncoercibles <- function(dataDF){
 get_items_in_rubric <- function(dataDF, rubricDF){
   requireNamespace('data.table', quietly = TRUE)
   dataDT <- as.data.table(dataDF)
-  rubricCols <- rubricDF$column_name[rubricDF$include %in% c(1, "1", "sum", "prod")]
+  rubricCols <- rubricDF$column_name[rubricDF$include %in% c(1, "1", "sum", "prod", "I")]
   smallDF <- as.data.frame(dataDT[item %in% rubricCols])
   return(smallDF)
 }
