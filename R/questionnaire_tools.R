@@ -296,7 +296,7 @@ score_questionnaire_dsn <- function(dataDF,rubricsDF){
   if(!is.na(dim(nonNumeric_items)[1]) && dim(nonNumeric_items)[1] > 0){
       non_numeric <- nonNumeric_items %>%
           mutate(na.rm=F) %>%
-          group_by(scale_name,scored_scale,SID) %>%
+          group_by(survey_name,scale_name,scored_scale,SID) %>%
           summarise(
               score=scorequaltrics:::score_items(
                   value,
@@ -341,7 +341,7 @@ score_questionnaire_dsn <- function(dataDF,rubricsDF){
 
   scored<-reverse_scored %>%
     mutate(na.rm=F) %>%
-    group_by(scale_name,scored_scale,SID) %>%
+    group_by(survey_name,scale_name,scored_scale,SID) %>%
     summarise(
       score=scorequaltrics:::score_items(
           value,
