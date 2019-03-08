@@ -256,12 +256,13 @@ transform_scores<-function(item_values,transformation,min=NA,max=NA){
 #'
 #' @param dataDF A data.frame as returned by \code{\link{get_survey_data}}
 #' @param rubricsDF A data.frame as returned by \code{\link{get_rubrics}}
+#' @param SID A regular expression specifying subject ID variable
 #' @param psych A flag specifying whether \code{\link[psych]{psych-package}} should be used for scoring. Default is \code{FALSE} but you should probably set it to \code{TRUE} unless you're using this for a DSN lab project
 #' @param ... Other arguments passed to one of the scoring engines.
 #'
 #' @return A long-form data.frame with scale scores.
 #' @export
-score_questionnaire<-function(dataDF, rubricsDF, psych = FALSE, ...){
+score_questionnaire<-function(dataDF, rubricsDF, SID, psych = FALSE, ...){
   if(psych){
     return(score_questionnaire_psych(dataDF, rubricsDF, ...))
   } else {
@@ -273,10 +274,11 @@ score_questionnaire<-function(dataDF, rubricsDF, psych = FALSE, ...){
 #'
 #' @param dataDF dataDF
 #' @param rubricsDF rubricsDF
+#' @param SID subject ID
 #'
 #' @import dplyr
 #' @import tidyr
-score_questionnaire_dsn <- function(dataDF,rubricsDF){
+score_questionnaire_dsn <- function(dataDF,rubricsDF,SID){
   #Takes long-form question data and rubric data, and a logical
   # value specifying whether to use _part2 rubrics.
   #Returns scored scales.
