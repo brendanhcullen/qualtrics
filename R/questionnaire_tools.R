@@ -266,7 +266,7 @@ score_questionnaire<-function(dataDF, rubricsDF, SID, psych = FALSE, ...){
   if(psych){
     return(score_questionnaire_psych(dataDF, rubricsDF, ...))
   } else {
-    return(score_questionnaire_dsn(dataDF, rubricsDF, ...))
+    return(score_questionnaire_dsn(dataDF, rubricsDF, SID, ...))
   }
 }
 
