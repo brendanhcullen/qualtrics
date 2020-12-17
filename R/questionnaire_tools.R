@@ -11,7 +11,7 @@
 get_survey_data<-function(surveysDF, pid_col='ID', ...){
   requireNamespace('dplyr', quietly = TRUE)
   requireNamespace('tidyr', quietly = TRUE)
-  
+
   survey_data <- surveysDF %>%
     dplyr::group_by(id) %>%
     dplyr::do(
@@ -56,19 +56,19 @@ get_rubrics <- function (rubric_filenames, type = 'scoring', source = "csv")
   if(! type %in% c('scoring', 'recoding')){
     stop('Option `type` must be either "scoring" or "recoding"')
   }
-  
+
   csv_rubrics <- rubric_filenames %>%
     mutate(file = as.character(file)) %>%
     group_by(file) %>% do({
       data_frame(rubric = list(read.csv(.$file[[1]], header = T,
                                         stringsAsFactors = F)))
     })
-  
+
   rubric_data_long <- csv_rubrics %>%
     group_by(file) %>%
     do({
       thisDF <- .$rubric[[1]]
-      
+
       names(thisDF) <- tolower(gsub(" ",
                                     "_",
                                     gsub("\\.",
@@ -82,19 +82,19 @@ get_rubrics <- function (rubric_filenames, type = 'scoring', source = "csv")
                               "min", "max")) %>%
           mutate_all(funs(as.character))
       } else if (type == 'recoding') {
-        
+
         aDF <- thisDF %>%
           mutate_all(funs(as.character))
       }
       aDF
     })
-  
+
   return(rubric_data_long)
 }
 
 #' get_uncoercibles returns values that should be kept as characters.
 #'
-#' @param dataDF 
+#' @param dataDF
 #'
 #' @import data.table
 #' @export
@@ -130,7 +130,7 @@ get_items_in_rubric <- function(dataDF, rubricDF){
 #' @param mean.na.rm mean.na.rm
 #' @param scale_name scale_name
 #' @param scored_scale scored_scale
-score_items<-function(item_values,scoring_methods,na.rm=F,mean.na.rm=T,scale_name='', scored_scale='', SID=''){
+score_items<-function(item_values,scoring_methods,na.rm=T,mean.na.rm=T,scale_name='', scored_scale='', SID=''){
   # item_values should be a vector of numbers
   # scoring_methods should be a function that takes a vector, or '1'
   #check that all elements in `scoring` are the same
@@ -140,7 +140,7 @@ score_items<-function(item_values,scoring_methods,na.rm=F,mean.na.rm=T,scale_nam
                 'grouping rows correctly, and that the rubric is correct.\n',
                 '(scale name is ',scale_name,', scored scale is ',scored_scale,')\n',
                 paste(scoring_methods, collapse='\n')))
-  
+
   length_vars <- lapply(list(item_values, scoring_methods), length)
   detail_vars <- list(SID = SID, scale_name = scale_name, scored_scale = scale_name)
   length_details <- lapply(detail_vars, length)
@@ -148,7 +148,7 @@ score_items<-function(item_values,scoring_methods,na.rm=F,mean.na.rm=T,scale_nam
       message('Empty values or scoring method vector...')
       if(any(length_details > 0)){
           details <- detail_vars[which(length_details > 0)]
-          message('Details: ', 
+          message('Details: ',
                   paste(paste(names(details), details, sep = ': '), collapse = ', '),
                   '.')
       } else {
@@ -156,10 +156,10 @@ score_items<-function(item_values,scoring_methods,na.rm=F,mean.na.rm=T,scale_nam
       }
       return(NA)
   }
-  
+
   scoring_method <- unique(scoring_methods)
   scoring_is_mean <- try(scoring_method == 1)
-  
+
   if (!inherits(scoring_is_mean, what = 'try-error') && scoring_is_mean){
     scoring_func<-mean
     na.rm=mean.na.rm
@@ -169,12 +169,12 @@ score_items<-function(item_values,scoring_methods,na.rm=F,mean.na.rm=T,scale_nam
   if (inherits(scoring_func, what = 'try-error')){
       if(any(length_details > 0)){
           details <- detail_vars[which(length_details > 0)]
-          message('Details: ', 
+          message('Details: ',
                   paste(paste(names(details), details, sep = ': '), collapse = ', '),
                   '.')
       } else {
           message('No scale or subscale info.')
-      }  
+      }
     stop(paste0('Scoring method "',scoring_method,'" not found.'))
   }
   if(na.rm) {
@@ -285,11 +285,11 @@ score_questionnaire_dsn <- function(dataDF,rubricsDF,SID){
   if(any(dim(dataDF)[1] < 1, dim(rubricsDF)[1] < 1)){
       return(data.frame())
   }
-  
+
   #rename subject ID column to SID
   dataDF = dataDF %>%
     rename("SID" = eval(SID))
-  
+
   scores_with_scoring_params<-rubricsDF  %>%
     left_join(
       dataDF,
@@ -300,7 +300,7 @@ score_questionnaire_dsn <- function(dataDF,rubricsDF,SID){
     filter(!is.na(survey_name)) # this filters out unused rubrics
 
   nonNumeric_items <- scores_with_scoring_params %>% filter(include %in% 'I')
-  
+
   if(!is.na(dim(nonNumeric_items)[1]) && dim(nonNumeric_items)[1] > 0){
       non_numeric <- nonNumeric_items %>%
           mutate(na.rm=F) %>%
